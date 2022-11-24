@@ -1,0 +1,21 @@
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"meta":{"count":204839,"next":"https://api.hel.fi/linkedevents/v1/event/?format=json&page=2","previous":null},"data":[{"id":"lippupiste:serie-2701044","location":{"@id":"https://api.hel.fi/linkedeven…
+RawContent        : HTTP/1.1 200 OK
+                    Date: Tue, 15 Nov 2022 17:28:57 GMT
+                    Connection: keep-alive
+                    Server: nginx/1.20.1
+                    Vary: Accept
+                    Vary: Origin
+                    X-Frame-Options: SAMEORIGIN
+                    x-cache-status-le-test: EXPIRED
+                    x-cache-ur…
+Headers           : {[Date, System.String[]], [Connection, System.String[]], [Server, System.String[]], [Vary, System.String[]]…}
+Images            : {}
+InputFields       : {}
+Links             : {@{outerHTML=<a href=\"https://hkt.fi/esitykset/once/\"><br>Lisätietoja</a>; tagName=A}, @{outerHTML=<a href=\"https://www.apu.fi/artikkelit/taalta-ikuisuuteen\">Kiviä taskussa -juttu Imagessa</a>; tagName=A}, @{outerHTML=<a href=\"https://hkt.fi/esitykset/kivia-taskussa/\">Lisätietoja</a>; tagName=A}, @{outerHTML=<a href=\"https://www.apu.fi/artikkelit/taalta-ikuisuuteen\">Kiviä taskussa -juttu Imagessa</a>; tagName=A}…}
+RawContentLength  : 181935
+RelationLink      : {}
+
+

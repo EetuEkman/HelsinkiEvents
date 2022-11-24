@@ -1,0 +1,333 @@
+:root {
+    --background: #212121;
+    --surface-1: #323232;
+    --surface-2: #434343;
+    --surface-3: #545454;
+    --surface-4: #656565;
+    --primary: #0D7377;
+    --secondary: #14FFEC;
+    --text: #FFFFFF;
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url("./Assets/fonts/Roboto-Regular.ttf") format("truetype");
+}
+
+* {
+    box-sizing: border-box;
+    font-family: "Roboto";
+    color: var(--text);
+    max-width: 100vw;
+}
+
+html, body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background);
+}
+
+.root {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+.wrapper {
+    width: 100vw;
+    height: 100vh;
+}
+
+button {
+    display: inline-flex;
+    color: var(--background);
+    background-color: var(--primary);
+    width: 10em;
+    display: flex;
+    padding: 1em 2em;
+    border: none;
+    border-radius: 0.25em;
+    justify-content: center;
+    align-items: center;
+}
+
+button:active {
+    filter: brightness(0.8);
+}
+
+button:disabled {
+    background-color: var(--surface-1);
+}
+
+#search-container {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    align-items: stretch;
+    max-width: 99vw;
+}
+
+#search-container > * > button {
+    background-color: var(--secondary);
+}
+
+#search-container > div {
+    display: flex;
+    flex-direction: row;
+    height: fit-content;
+    justify-content: flex-start;
+    padding: 0.25em;
+}
+
+#search-container > div > * {
+    margin: 0 0.25em 0 0.25em;
+}
+
+#search-container > .select-language > select {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    padding: 0.5em 1em;
+    border: none;
+    color: var(--background);
+    background-color: var(--primary);
+    text-decoration: none;
+    justify-content: center;
+    border-radius: 0.125em;
+}
+
+#search-container > .select-language > select option {
+    background-color: var(--surface-1);
+}
+
+#search-container > .date {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#search-container > .date > input {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    padding: 0.5em 1em;
+    border: none;
+    color: var(--background);
+    background-color: var(--primary);
+    text-decoration: none;
+    justify-content: center;
+    border-radius: 0.125em;
+}
+
+#events-container {
+    display: grid;
+    grid-template-columns: 1fr minmax(1em 1fr);
+    grid-template-rows: fit-content(33%) 1fr fit-content(33%);
+    padding: 0.25em;
+    gap: 0.25em;
+    height: 100%;
+    max-width: 100%;
+}
+
+#event-list {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    margin: 0;
+    padding: 0.25em;
+    width: 100%;
+    gap: 0.25em;
+}
+
+#event-list > li {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    height: 14em;
+    padding: 0.25em;
+    background-color: var(--surface-1);
+    box-shadow: 1px 1px 1px black;
+    border: 1px solid black;
+    width: 100%;
+}
+
+#event-list > li.is-working {
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background);
+    border: none;
+    box-shadow: none;
+    height: 100%;
+}
+
+#event-list > li > svg {
+    max-height: 12em;
+}
+
+#event-list > li > span {
+    margin: 0 0.5em 0 0.5em;
+}
+
+#event-list > li > img {
+    max-height: 100%;
+    max-width: 32%;
+    display: inline-block;
+    outline: 1px solid black;
+    filter: brightness(0.9) contrast(1.1);
+    box-shadow: 1px 1px 1px black;
+    margin: 0 1em 0 auto;
+}
+
+#navigation-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5em;
+}
+
+#navigation-container > * {
+    width: 7em;
+    margin: 0 0.25em 0 0.25em;
+}
+
+#navigation-container > span {
+    display: flex;
+    justify-content: center;
+}
+
+#is-working-circle {
+    animation: rotation 2s infinite linear;
+    transform-origin: 50% 50%;
+    filter: brightness(0.9);
+}
+
+@keyframes rotation {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+
+.event-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+    height: fit-content;
+    padding: 0.25em;
+}
+
+.event-details > div {
+    display: flex;
+    margin: 0 0.25em;
+    padding: 0.5em;
+    min-height: 0;
+    min-width: 0;
+}
+
+.event-details > .event-description {
+    flex-direction: column;
+}
+
+.event-details > .event-description > * {
+    margin: 0.125em;
+    padding: 0.125em;
+}
+
+.event-details > .event-place {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    max-width: 100vw;
+}
+
+.event-details > .event-place > img {
+    display: inline;
+    outline: 1px solid black;
+    max-width: 33%;
+    max-height: 100%;
+    filter: brightness(0.9) contrast(1.1);
+}
+
+.event-details > .event-place > .event-place-information {
+    display: block;
+}
+
+.event-details > .event-details-images {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    border: none;
+}
+
+.event-details > .event-details-images > img {
+    outline: 1px solid black;
+    margin: 0.5em;
+    transition: transform 0.25s ease;
+    max-height: 100%;
+    max-width: 50%;
+    transform-origin: bottom left;
+    filter: brightness(0.8) contrast(1.1);
+    box-shadow: 1px 1px 1px black;
+}
+
+.event-details > .event-details-images > img:hover {
+    transform: scale(1.5);
+}
+
+.event-details > button {
+    position: fixed;
+    background-color: var(--secondary);
+    right: 2em;
+    bottom: 0;
+    font-size: 1.5em;
+}
+
+.event-details > .event > h1 {
+    margin-left: 0.125em;
+}
+
+/*
+.event-details > .event-date {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 0;
+    margin: 0;
+    width: fit-content;
+    height: fit-content;
+}
+*/
+
+.event-details > .event {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.5em;
+}
+
+.event-offers {
+    flex-direction: row;
+    gap: 1em;
+    align-items: center;
+}
+
+.event-offers > h3 {
+    margin-left: 0.125em;
+}
+
+.offer {
+    flex-direction: row;
+}
+
+span {
+    margin: 0 0.125em 0 0.125em;
+}
