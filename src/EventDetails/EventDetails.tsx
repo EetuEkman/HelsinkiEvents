@@ -1,13 +1,22 @@
 import React from "react";
 import Event from "../models/Event";
+import Image from "../models/Image";
+import Place from "../models/Place";
 
 interface Props {
     event: Event;
+    places: Place[];
+    placeImages: Image[];
     onClick: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 export default function EventDetails(props: Props) {
-    const placeImage = props.event.linkedLocation?.linkedImage;
+    const place = props.places.find(place => place["@id"] === props.event.location["@id"]);
+
+    let imageId = place?.image;
+
+    const placeImage = props.placeImages.find(image => image.id === imageId);
+
     const noImageAvailable = require("../Assets/no_image_available.png");
 
     return (
@@ -31,7 +40,7 @@ export default function EventDetails(props: Props) {
             }
 
             {
-                props.event.linkedLocation ?
+                place ?
                     <div className="event-place">
 
                         {
@@ -40,12 +49,12 @@ export default function EventDetails(props: Props) {
 
                         <div className="event-place-information">
                             <h3>Paikka</h3>
-                            <div>{props.event.linkedLocation.name?.fi}</div>
-                            <div>{props.event.linkedLocation.street_address?.fi}</div>
-                            <div>{props.event.linkedLocation.postal_code} {props.event.linkedLocation.address_locality?.fi}</div>
-                            <div>{props.event.linkedLocation.telephone?.fi}</div>
-                            <div>{props.event.linkedLocation.email}</div>
-                            <div><a href={props.event.linkedLocation.info_url?.fi} target="_blank">{props.event.linkedLocation.info_url?.fi}</a></div>
+                            <div>{place?.name?.fi}</div>
+                            <div>{place?.street_address?.fi}</div>
+                            <div>{place?.postal_code} {place?.address_locality?.fi}</div>
+                            <div>{place?.telephone?.fi}</div>
+                            <div>{place?.email}</div>
+                            <div><a href={place?.info_url?.fi} target="_blank">{place?.info_url?.fi}</a></div>
                         </div>
                     </div>
                     :
@@ -54,8 +63,9 @@ export default function EventDetails(props: Props) {
 
             {
                 props.event.external_links ? <div className="event-details-external-links">
-                    {props.event.external_links.map(externalLink =>
-                        <div className="event-details-external-link"><a href={externalLink.link}>{externalLink.name}</a></div>)
+                    {props.event.external_links.map((externalLink, index) =>
+                    /* external link name like extlink_facebook,  */
+                        <div key={index} className="event-details-external-link"><a href={externalLink.link}>{externalLink.name}</a></div>)
                     }
                 </div> : <></>
             }
