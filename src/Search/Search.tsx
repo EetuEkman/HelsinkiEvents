@@ -2,6 +2,7 @@ import * as React from 'react';
 import Languages from '../models/Languages';
 import QueryParameters from '../models/QueryParameters';
 import DatePicker from "./DatePicker"
+import TextInput from './TextInput';
 
 interface Props {
     languages: Languages;
@@ -42,6 +43,7 @@ export default function Search(props: Props) {
     
     return (
         <div id='search-container'>
+            <TextInput queryParameters={props.queryParameters} setQueryParameters={props.setQueryParameters}></TextInput>
             <div className="date">
                 <DatePicker label="From" queryParameters={props.queryParameters} setQueryParamaters={props.setQueryParameters}></DatePicker>
                 <DatePicker label="To" queryParameters={props.queryParameters} setQueryParamaters={props.setQueryParameters}></DatePicker>

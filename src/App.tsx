@@ -39,6 +39,10 @@ const eventsPlaceholder: Events = {
 
 const LANGUAGE_URL = "https://api.hel.fi/linkedevents/v1/language/";
 
+const LOCAL_STORAGE_PLACES = "Helsinki-events/places-v1";
+const LOCAL_STORAGE_IMAGES = "Helsinki-events/images-v1";
+const LOCAL_STORAGE_EVENTS = "Helsinki-events/events-v1";
+
 async function fetchLanguages(): Promise<Object> {
   let response = await fetch(LANGUAGE_URL);
 
@@ -72,21 +76,60 @@ function unshiftDefaultLanguage(oldLanguages: Languages): Languages {
 
 
 function App() {
+  // Languages available for the search
   const [languages, setLanguages] = useState<Languages>(languagesPlaceholder)
+
+  // Search results: event list, pagination
   const [events, setEvents] = useState<Events>(eventsPlaceholder);
+
+  // Ongoing http requests etc. asynchronous happening
   const [isWorking, setIsWorking] = useState<boolean>(true);
+
+  // Selected event, index of the events.data
   const [eventIndex, setEventIndex] = useState<number>(-1);
 
-  // A "cache" for place images
+  // Place image objects
   const [placeImages, setPlaceImages] = useState<Image[]>([]);
 
-  // A "cache" for places
+  // Place object
   const [places, setPlaces] = useState<Place[]>([]);
 
-  const [queryParameters, setQueryParameters] = useState<QueryParameters>({ isFree: false, start: "", end: "", language: "none" });
+  // Search options
+  const [queryParameters, setQueryParameters] = useState<QueryParameters>({ text: "", isFree: false, start: "", end: "", language: "none" });
 
+  // Ran on initial load
   const loadData = async () => {
     setIsWorking(isWorking => true)
+
+    let storedImages = localStorage.getItem(LOCAL_STORAGE_IMAGES);
+
+    if (storedImages) {
+      let json = JSON.parse(storedImages);
+
+      let images = assertImages(json);
+
+      setPlaceImages(placeImages => images);
+    }
+
+    let storedPlaces = localStorage.getItem(LOCAL_STORAGE_PLACES);
+
+    if (storedPlaces) {
+      let json = JSON.parse(storedPlaces);
+
+      let places = assertPlaces(json);
+
+      setPlaces(p => places);
+    }
+
+    let storedEvents = localStorage.getItem(LOCAL_STORAGE_EVENTS);
+
+    if (storedEvents) {
+      let json = JSON.parse(storedEvents);
+
+      let events = assertEvents(json);
+
+      setEvents(e => events);
+    }
 
     fetchLanguages()
       .then(fetchedLanguages => assertLanguages(fetchedLanguages))
@@ -99,12 +142,14 @@ function App() {
     getEvents();
   }
 
+  // Fetch and set the events
   const getEvents = async (url?: string) => {
     setIsWorking(isWorking => true);
 
     fetchEvents(url, queryParameters)
       .then(fetchedEvents => assertEvents(fetchedEvents))
-      .then(newEvents => setEvents(events => newEvents))
+      .then(newEvents => { setEvents(events => newEvents); return newEvents })
+      .then(newEvents => localStorage.setItem(LOCAL_STORAGE_EVENTS, JSON.stringify(newEvents)))
       .then(() => setIsWorking(isWorking => false)); 
   }
 
@@ -158,6 +203,8 @@ function App() {
       fetchPlaces(neededIds).then(places => assertPlaces(places)).then(assertedPlaces => {
         let newPlaces = [...places, ...assertedPlaces];
 
+        localStorage.setItem(LOCAL_STORAGE_PLACES, JSON.stringify(newPlaces));
+
         setPlaces(places => newPlaces);
       })
 
@@ -174,6 +221,8 @@ function App() {
         .then(images => assertImages(images))
         .then(images => {
           let newImages = [...placeImages, ...images];
+
+          localStorage.setItem(LOCAL_STORAGE_IMAGES, JSON.stringify(newImages));
 
           setPlaceImages(placeImages => newImages);
         })

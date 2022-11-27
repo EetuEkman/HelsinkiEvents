@@ -2,6 +2,7 @@ import Events from "./models/Events";
 import QueryParameters from "./models/QueryParameters";
 
 const EMPTY_QUERY_PARAMETERS: QueryParameters = {
+    text: "",
     isFree: false,
     start: "",
     end: "",
@@ -23,6 +24,10 @@ export default async function fetchEvents(url: string = EVENTS_URL, queryParamet
     let working = false;
 
     let retries = 0;
+
+    if (queryParameters.text.length > 0) {
+        url = url + "&text=" + queryParameters.text;
+    }
 
     if (queryParameters.start.length > 0) {
         url = url + "&start=" + queryParameters.start;
