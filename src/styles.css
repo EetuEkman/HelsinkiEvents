@@ -42,7 +42,7 @@ button {
     display: inline-flex;
     color: var(--background);
     background-color: var(--primary);
-    width: 10em;
+    width: 8em;
     display: flex;
     padding: 1em 2em;
     border: none;
@@ -242,8 +242,9 @@ button:disabled {
     display: flex;
     flex-direction: column;
     gap: 1em;
-    height: 33em;
+    height: fit-content;
     width: 100%;
+    margin-bottom: 5em;
 }
 
 .event-details > .event-place > .event-place-information {
@@ -252,7 +253,15 @@ button:disabled {
     justify-items: flex-start;
     width: 100%;
     height: fit-content;
-    max-height: 12em;
+    max-height: 10em;
+}
+
+.event-details > .event-place > .event-place-information > div {
+    height: fit-content
+}
+
+.event-details > .event-place > .event-place-information > div > svg {
+    margin-right: 0.25em;
 }
 
 .event-details > .event-place > .event-place-image-container {
@@ -260,7 +269,7 @@ button:disabled {
     flex-direction: row;
     justify-content: flex-start;
     align-items: flex-start;
-    height: 20em;
+    height: 15em;
     width: 100%;
     padding: 0;
     margin: 0;
@@ -301,9 +310,9 @@ button:disabled {
 .event-details > button {
     position: fixed;
     background-color: var(--secondary);
-    right: 2em;
-    bottom: 0;
-    font-size: 1.5em;
+    right: 1em;
+    bottom: 0.5em;
+    font-size: 1.25em;
 }
 
 .event-details > .event {
@@ -321,6 +330,37 @@ button:disabled {
     flex-direction: row;
 }
 
+.event-details-external-links {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: fit-content;
+    flex-wrap: wrap;
+    gap: 1em;
+    margin: 0.5em 0 0.5em 0;
+}
+
+.event-details-external-links > div {
+    width: 5em;
+    height: 5em;
+}
+
+.event-details-external-links > div > a {
+    width: 100%;
+    height: 100%;
+}
+
+.event-details-external-links > div > a:active, a:focus {
+    outline: none;
+    border: none;
+}
+
+.event-details-external-links > div > a > svg {
+    height: 100%;
+    width: 100%;
+    filter: brightness(0) saturate(100%) invert(68%) sepia(39%) saturate(6115%) hue-rotate(127deg) brightness(103%) contrast(103%);
+}
+
 span {
     margin: 0 0.125em 0 0.125em;
 }
@@ -334,8 +374,24 @@ label {
     align-items: center;
 }
 
+.event-place-information > * > svg {
+    filter: brightness(0) saturate(100%) invert(68%) sepia(39%) saturate(6115%) hue-rotate(127deg) brightness(103%) contrast(103%);
+}
+
 @media only screen and (min-width: 600px) {
     .event-details > .event-details-images > img:hover {
         transform: scale(1.5);
+    }
+
+    .event-details > .event-place > .event-place-image-container {
+        height: 20em;
+    }
+
+    .event-details > button {
+        position: fixed;
+        background-color: var(--secondary);
+        right: 2em;
+        bottom: 1em;
+        font-size: 1.5em;
     }
 }

@@ -42,6 +42,8 @@ const LANGUAGE_URL = "https://api.hel.fi/linkedevents/v1/language/";
 const LOCAL_STORAGE_PLACES = "Helsinki-events/places-v1";
 const LOCAL_STORAGE_IMAGES = "Helsinki-events/images-v1";
 const LOCAL_STORAGE_EVENTS = "Helsinki-events/events-v1";
+const LOCAL_STORAGE_SEARCH = "Helsinki-events/search-v1";
+const SESSION_STORAGE_INDEX = "Helsinki-events/event-index-v1";
 
 async function fetchLanguages(): Promise<Object> {
   let response = await fetch(LANGUAGE_URL);
@@ -131,6 +133,24 @@ function App() {
       setEvents(e => events);
     }
 
+    let storedSearch = localStorage.getItem(LOCAL_STORAGE_SEARCH);
+
+    if (storedSearch) {
+      let json = JSON.parse(storedSearch);
+
+      let search = json as QueryParameters;
+
+      setQueryParameters(qp => search);
+    }
+
+    let storedEventIndex = sessionStorage.getItem(SESSION_STORAGE_INDEX);
+
+    if (storedEventIndex) {
+      let eventIndex = Number.parseInt(storedEventIndex);
+
+      setEventIndex(ei => eventIndex);
+    }
+
     fetchLanguages()
       .then(fetchedLanguages => assertLanguages(fetchedLanguages))
       .then(assertedLanguages => unshiftDefaultLanguage(assertedLanguages))
@@ -146,11 +166,13 @@ function App() {
   const getEvents = async (url?: string) => {
     setIsWorking(isWorking => true);
 
+    sessionStorage.setItem(LOCAL_STORAGE_SEARCH, JSON.stringify(queryParameters));
+
     fetchEvents(url, queryParameters)
       .then(fetchedEvents => assertEvents(fetchedEvents))
       .then(newEvents => { setEvents(events => newEvents); return newEvents })
       .then(newEvents => localStorage.setItem(LOCAL_STORAGE_EVENTS, JSON.stringify(newEvents)))
-      .then(() => setIsWorking(isWorking => false)); 
+      .then(() => setIsWorking(isWorking => false));
   }
 
   const handleEventClick = (event: React.MouseEvent<HTMLLIElement>) => {
@@ -167,6 +189,8 @@ function App() {
     }
 
     setEventIndex(eventIndex => index);
+
+    sessionStorage.setItem(SESSION_STORAGE_INDEX, index.toString());
   }
 
   const handleEventDetailsClick = (event: React.MouseEvent<HTMLButtonElement>) => {

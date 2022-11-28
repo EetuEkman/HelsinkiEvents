@@ -9,8 +9,6 @@ interface Props {
 }
 
 export default function EventList(props: Props) {
-    const noImageAvailable = require("../Assets/no_image_available.png");
-
     return (
         <ul id="event-list">
             {
