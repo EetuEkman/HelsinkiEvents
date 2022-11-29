@@ -1,3 +1,4 @@
+import ExternalLink from "./ExternalLink";
 import Image from "./Image";
 import Keyword from "./Keyword";
 import Offer from "./Offer";
@@ -48,12 +49,6 @@ interface PlaceResource {
     "@id": string
 }
 
-interface ExternalLink {
-    name?: string;
-    link?: string;
-    language?: string;
-}
-
 interface Provider {
     fi?: string;
     en?: string;
@@ -86,9 +81,9 @@ export default interface Event {
     deleted?: boolean;
     replaced_by?: Object;
     extension_course?: ExtensionCourse;
-    offers?: Offer[]
-    external_links?: ExternalLink[]
-    provider?: Provider
+    offers?: Offer[];
+    external_links?: ExternalLink[];
+    provider?: Provider;
     "@id": string;
     "@context"?: string;
     "@type"?: string;

@@ -133,7 +133,7 @@ function App() {
       setEvents(e => events);
     }
 
-    let storedSearch = localStorage.getItem(LOCAL_STORAGE_SEARCH);
+    let storedSearch = sessionStorage.getItem(LOCAL_STORAGE_SEARCH);
 
     if (storedSearch) {
       let json = JSON.parse(storedSearch);

@@ -2,7 +2,7 @@ import React from "react";
 import Event from "../models/Event";
 import Place from "../models/Place";
 import Image from "../models/Image";
-import { faPhone, faEnvelope, faHouse } from "@fortawesome/free-solid-svg-icons";
+import { faPhone, faEnvelope, faLocationDot, faExternalLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface Props {
@@ -23,15 +23,28 @@ export default function EventPlace(props: Props) {
             ?
             <div className="event-place">
                 <div className="event-place-information">
-                    <h3>Paikka</h3>
-                    <div>{place?.name?.fi}</div>
-                    <div>{place?.street_address?.fi}</div>
-                    <div>{place?.postal_code} {place?.address_locality?.fi}</div>
-                    { place.telephone?.fi ? <div><FontAwesomeIcon icon={faPhone}></FontAwesomeIcon>{place?.telephone?.fi}</div> : <></> }
-                    { place.telephone?.en ? <div><FontAwesomeIcon icon={faPhone}></FontAwesomeIcon>{place?.telephone?.en}</div> : <></> }
-                    { place.telephone?.se ? <div><FontAwesomeIcon icon={faPhone}></FontAwesomeIcon>{place?.telephone?.se}</div> : <></> }
-                    { place.email ? <div><FontAwesomeIcon icon={faEnvelope}></FontAwesomeIcon><a href={"mailto:" + place?.email}>{place?.email}</a></div> : <></>}
-                    <div><a href={place?.info_url?.fi} target="_blank">{place?.info_url?.fi}</a></div>
+                    <div className="address">
+                        <FontAwesomeIcon icon={faLocationDot}></FontAwesomeIcon>
+                        <div>
+                            <div>{place?.name?.fi}</div>
+                            <div>{place?.street_address?.fi}</div>
+                            <div>{place?.postal_code} {place?.address_locality?.fi}</div>
+                        </div>
+                    </div>
+                    <div className="phone">
+                        <FontAwesomeIcon icon={faPhone}></FontAwesomeIcon>
+                        <div>
+                            {place.telephone?.fi ? <div>{place?.telephone?.fi}</div> : <></>}
+                            {place.telephone?.en ? <div>{place?.telephone?.en}</div> : <></>}
+                            {place.telephone?.se ? <div>{place?.telephone?.se}</div> : <></>}
+                        </div>
+                    </div>
+                    
+                    { place.email ? <div className="email"><FontAwesomeIcon icon={faEnvelope}></FontAwesomeIcon><a href={"mailto:" + place?.email}>{place?.email}</a></div> : <></>}
+                    <div className="link">
+                        <FontAwesomeIcon icon={faExternalLink}></FontAwesomeIcon>
+                        <a href={place?.info_url?.fi} target="_blank">{place?.info_url?.fi}</a>
+                    </div>
                 </div>
                 {
                     placeImage ?

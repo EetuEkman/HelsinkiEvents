@@ -12,21 +12,15 @@ function socialMediaLink(externalLink: ExternalLink, key: number): JSX.Element {
     let name = externalLink.name;
     let link = externalLink.link;
 
-    /* external link name like extlink_facebook,  */
-
     switch (name) {
         case "extlink_instagram":
             return <div key={key}><a href={link}><FontAwesomeIcon icon={faInstagram}></FontAwesomeIcon></a></div>
-            break;
         case "extlink_facebook":
             return <div key={key}><a href={link}><FontAwesomeIcon icon={faFacebook}></FontAwesomeIcon></a></div>
-            break;
         case "extlink_youtube":
             return <div key={key}><a href={link}><FontAwesomeIcon icon={faYoutube}></FontAwesomeIcon></a></div>
-            break;
         case "extlink_twitter":
             return <div key={key}><a href={link}><FontAwesomeIcon icon={faTwitter}></FontAwesomeIcon></a></div>
-            break;
         default:
             return <div key={key} className="event-details-external-link"><a href={externalLink.link}>{externalLink.name}</a></div>
     }
