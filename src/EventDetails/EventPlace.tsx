@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Event from "../models/Event";
 import Place from "../models/Place";
 import Image from "../models/Image";
 import { faPhone, faEnvelope, faLocationDot, faExternalLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import * as Leaflet from "leaflet"
 
 interface Props {
     event: Event;
@@ -17,6 +18,43 @@ export default function EventPlace(props: Props) {
     let imageId = place?.image;
 
     const placeImage = props.placeImages.find(image => image.id === imageId);
+
+    // Leaflet map needs element to exist before initialization.
+
+    useEffect(() => {
+        // Place's position might not be set.
+
+        if (place?.position) {
+            let longitude = place?.position?.coordinates[0];
+    
+            let latitude = place?.position?.coordinates[1];
+
+            // Center on the place coordinates.
+        
+            let map = Leaflet.map("map", {
+                center: [latitude, longitude],
+                zoom: 16
+            });
+
+            // Map pans back to the place coordinates on mouse out.
+
+            map.addEventListener("mouseout", () => {
+                map.panTo([latitude, longitude]);
+            });
+
+            // Add a marker at the place coordinates.
+
+            Leaflet.marker([latitude, longitude]).addTo(map);
+
+            // A "slippy map" requires tile layer. Tile layer provided by openstreetmap.
+
+            Leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                minZoom: 12,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+        }
+    }, [place])
 
     return (
         place
@@ -54,6 +92,18 @@ export default function EventPlace(props: Props) {
                         :
                         <></>
                 }
+
+                {
+                    // Needed for the Leaflet map.
+                    place.position
+                        ?
+                        <div className="map-container">
+                            <div id="map"></div>
+                        </div>
+                        :
+                        <></>
+                }
+                
             </div>
             :
             <></>

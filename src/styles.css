@@ -242,10 +242,11 @@ button:disabled {
 .event-details > .event-place {
     display: flex;
     flex-direction: column;
-    gap: 1em;
     height: fit-content;
     width: 100%;
-    margin: 0.5em 0 5em 0;
+    margin: 0.5em 0 0.5em 0;
+    padding: 0.5em 0 0.5em 0;
+    gap: 1em;
 }
 
 .event-details > .event-place > .event-place-information {
@@ -271,8 +272,8 @@ button:disabled {
     flex-direction: row;
     justify-content: flex-start;
     align-items: flex-start;
-    height: 15em;
-    width: 100%;
+    height: 25em;
+    width: 37.5em;
     padding: 0;
     margin: 0;
 }
@@ -280,14 +281,8 @@ button:disabled {
 .event-details > .event-place > .event-place-image-container > img {
     height: 100%;
     object-fit: contain;
+    object-position: left;
     filter: brightness(0.9) contrast(1.1);
-    outline: 1px solid black;
-}
-
-#no-image-available {
-    width: 240px;
-    height: 240px;
-    outline: none;
 }
 
 .event-details > .event-details-images {
@@ -316,6 +311,8 @@ button:disabled {
     right: 1em;
     bottom: 0.5em;
     font-size: 1.25em;
+    z-index: 20;
+    outline: 1px solid black;
 }
 
 .event-details > .event {
@@ -411,13 +408,22 @@ label {
     width: 2em;
 }
 
+.event-place > .map-container {
+    height: 25em;
+    width: 37.5em;
+    max-width: 100%;
+    outline: 1px solid black;
+}
+
+#map {
+    height: 100%;
+    z-index: 10;
+    filter: brightness(0.9) contrast(1.1);
+}
+
 @media only screen and (min-width: 600px) {
     .event-details > .event-details-images > img:hover {
         transform: scale(1.5);
-    }
-
-    .event-details > .event-place > .event-place-image-container {
-        height: 20em;
     }
 
     .event-details > button {

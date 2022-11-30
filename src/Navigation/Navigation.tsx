@@ -26,7 +26,7 @@ function getPageNumberFromPreviousUrl(url: string | undefined): string {
 }
 
 function getMaxPages(itemCount: number, itemsPerPage: number): number {
-    return Math.floor(itemCount / itemsPerPage);
+    return Math.ceil(itemCount / itemsPerPage);
 }
 
 export default function Navigation(props: Props) {
