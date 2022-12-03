@@ -1,12 +1,16 @@
 import Events from "./models/Events";
-import QueryParameters from "./models/QueryParameters";
+import QueryParameters, { OrderBy } from "./models/QueryParameters";
 
 const EMPTY_QUERY_PARAMETERS: QueryParameters = {
     text: "",
     isFree: false,
     start: "",
     end: "",
-    language: "none"
+    language: "none",
+    orderBy: OrderBy.lastModifiedTime,
+    orderByDescending: true,
+    topics: [],
+    audiences: []
 }
 
 const MAX_RETRIES = 2;
@@ -14,7 +18,7 @@ const MAX_RETRIES = 2;
 const EVENTS_URL = "https://api.hel.fi/linkedevents/v1/event/?format=json";
 
 /**
- * Fetches a events object from the events resource with query parameters
+ * Fetches a events object from the events resource with query parameters or without the query parameters if supplied with url.
  * @param url url to the events resource
  * @param queryParameters query parameters object
  * @returns 
@@ -25,27 +29,58 @@ export default async function fetchEvents(url: string = EVENTS_URL, queryParamet
 
     let retries = 0;
 
-    if (queryParameters.text.length > 0) {
-        url = url + "&text=" + queryParameters.text;
-    }
-
-    if (queryParameters.start.length > 0) {
-        url = url + "&start=" + queryParameters.start;
-    }
-
-    if (queryParameters.end.length > 0) {
-        url = url + "&end=" + queryParameters.end;
-    }
-
-    if (queryParameters.isFree) {
-        url = url + "&is_free=true"
-    }
-
-    if (queryParameters.language !== "none") {
-        url = url + "&language=" + queryParameters.language;
-    }
-
+    // This function is also used by the pagination links to fetch the next set or "page" of events.
+    // These links are included in the initial events object inside the meta member.
+    // In this case the url is different than default EVENTS_URL.
+    if(url === EVENTS_URL) {
+        if (queryParameters.text.length > 0) {
+            url = url + "&text=" + queryParameters.text;
+        }
     
+        if (queryParameters.start.length > 0) {
+            url = url + "&start=" + queryParameters.start;
+        }
+    
+        if (queryParameters.end.length > 0) {
+            url = url + "&end=" + queryParameters.end;
+        }
+    
+        if (queryParameters.isFree) {
+            url = url + "&is_free=true"
+        }
+    
+        if (queryParameters.language !== "none") {
+            url = url + "&language=" + queryParameters.language;
+        }
+    
+        url = url + "&sort=";
+    
+        if (queryParameters.orderByDescending) {
+            url = url + "-";
+        }
+    
+        url = url + queryParameters.orderBy;
+
+        if (queryParameters.topics.length > 0 || queryParameters.audiences.length > 0) {
+            url = url + "&keyword_AND=";
+
+            if (queryParameters.topics.length > 0) {
+                let topics = queryParameters.topics.join();
+    
+                url = url + topics;
+            }
+
+            if (queryParameters.audiences.length > 0) {
+                let audiences = queryParameters.audiences.join();
+
+                if (queryParameters.topics.length > 0) {
+                    url = url + ",";
+                }
+    
+                url = url + audiences;
+            }
+        }
+    }
 
     let response = await fetch(url);
 
@@ -70,9 +105,9 @@ export default async function fetchEvents(url: string = EVENTS_URL, queryParamet
 }
 
 /**
- * Asserts the unasserted events object to a events object type
+ * Asserts the unasserted events object to a events object type for type hints etc.
  * @param fetchedEvents unasserted events object
- * @returns arrerted events object
+ * @returns asserted events object
  */
 
 export function assertEvents(fetchedEvents: Object): Events {

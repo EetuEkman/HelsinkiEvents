@@ -9,6 +9,7 @@ interface Name {
 export default interface Keyword {
     id: string;
     name: Name;
+    image?: Image;
     images?: Image[];
     origin_id?: string;
     publisher?: string;
@@ -21,4 +22,7 @@ export default interface Keyword {
     alt_labels?: string[];
     deprecated?: boolean;
     replaced_by?: Object;
+    "@id": string;
+    "@context": string;
+    "@type": string;
 }

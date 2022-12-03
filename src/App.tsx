@@ -1,21 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { hot } from "react-hot-loader/root";
-import Language from './models/Language';
+
 import Languages from './models/Languages';
-import Event from "./models/Event";
 import Events from './models/Events';
+import Image from './models/Image';
+import Place from './models/Place';
+import KeywordSet from './models/KeywordSet';
+import Keyword from './models/Keyword';
+import QueryParameters, { OrderBy } from './models/QueryParameters';
+
 import Search from './Search/Search';
 import EventList from './EventList/EventList';
 import Navigation from './Navigation/Navigation';
 import EventDetails from './EventDetails/EventDetails';
-import Image from './models/Image';
-import Place from './models/Place';
-import QueryParameters from './models/QueryParameters';
+
 import fetchImages, { assertImages, getNeededImageIds } from "./FetchImages";
 import fetchPlaces, { assertPlaces, getNeededPlaceIds } from "./FetchPlaces";
 import fetchEvents, { assertEvents } from './FetchEvents';
+import fetchLanguages from './FetchLanguages';
+import fetchKeywordsFromKeywordSet, { fetchKeywordSet, keywordSetNames } from './FetchKeywords';
 
-const languagesPlaceholder: Languages = {
+
+const LANGUAGES_PLACEHOLDER: Languages = {
   data: [
     {
       id: "none",
@@ -28,7 +34,7 @@ const languagesPlaceholder: Languages = {
   ]
 }
 
-const eventsPlaceholder: Events = {
+const EVENTS_PLACEHOLDER: Events = {
   meta: {
     count: 0,
     previous: undefined,
@@ -37,73 +43,82 @@ const eventsPlaceholder: Events = {
   data: []
 }
 
-const LANGUAGE_URL = "https://api.hel.fi/linkedevents/v1/language/";
-
-const LOCAL_STORAGE_PLACES = "Helsinki-events/places-v1";
-const LOCAL_STORAGE_IMAGES = "Helsinki-events/images-v1";
-const LOCAL_STORAGE_EVENTS = "Helsinki-events/events-v1";
-const LOCAL_STORAGE_SEARCH = "Helsinki-events/search-v1";
-const SESSION_STORAGE_INDEX = "Helsinki-events/event-index-v1";
-
-async function fetchLanguages(): Promise<Object> {
-  let response = await fetch(LANGUAGE_URL);
-
-  let languages = await response.json();
-
-  return languages;
+const DEFAULT_QUERY_PARAMETERS = {
+  text: "",
+  isFree: false,
+  start: "",
+  end: "",
+  language: "none",
+  orderBy: OrderBy.lastModifiedTime,
+  orderByDescending: true,
+  topics: [],
+  audiences: []
 }
 
-function assertLanguages(fetchedLanguages: Object): Languages {
-  let languages = { ...fetchedLanguages } as Languages;
-
-  return languages;
+const LOCAL_STORAGE_KEYS = {
+  places: "Helsinki-events/places-v1",
+  images: "Helsinki-events/images-v1",
+  events: "Helsinki-events/events-v1",
+  search: "Helsinki-events/search-v1",
+  eventIndex: "Helsinki-events/event_index-v1",
+  topics: "Helsinki-events/topics-v1",
+  audiences: "Helsinki-events/audiences-v1",
+  keywordSets: {
+    topics: "Helsinki-events/keyword_sets/topics-v1",
+    audiences: "Helsinki-events/keyword_sets/audiences-v1"
+  }
 }
 
-function unshiftDefaultLanguage(oldLanguages: Languages): Languages {
-  let newLanguages = { ...oldLanguages };
+async function getStoredKeywordSet(keywordSetKey: string, keywordSetName: string): Promise<KeywordSet> {
+  let keywordSetString = localStorage.getItem(keywordSetKey);
 
-  let defaultLanguage: Language = {
-    id: "none",
-    name: {
-      fi: "ei valittu",
-      en: "none selected",
-      se: "ingen vald"
-    }
-  };
+  if (!keywordSetString) {
+    let keywordSet = await fetchKeywordSet(keywordSetName);
 
-  newLanguages.data.unshift(defaultLanguage);
+    localStorage.setItem(keywordSetKey, JSON.stringify(keywordSet));
 
-  return newLanguages;
+    return keywordSet;
+  }
+
+  return JSON.parse(keywordSetString) as KeywordSet;
 }
+
 
 
 function App() {
-  // Languages available for the search
-  const [languages, setLanguages] = useState<Languages>(languagesPlaceholder)
+  // Available languages fetched from the endpoint, used in filtering fetched events.
+  const [languages, setLanguages] = useState<Languages>(LANGUAGES_PLACEHOLDER);
 
-  // Search results: event list, pagination
-  const [events, setEvents] = useState<Events>(eventsPlaceholder);
+  // Used to store events: event list, pagination
+  const [events, setEvents] = useState<Events>(EVENTS_PLACEHOLDER);
 
-  // Ongoing http requests etc. asynchronous happening
+  // Used to track ongoing http requests etc. asynchronous happening.
   const [isWorking, setIsWorking] = useState<boolean>(true);
 
-  // Selected event, index of the events.data
+  // Used to track user's selected event, index for the events.data.
   const [eventIndex, setEventIndex] = useState<number>(-1);
 
-  // Place image objects
+  // Used to store place image objects to avoid fetching.
   const [placeImages, setPlaceImages] = useState<Image[]>([]);
 
-  // Place object
+  // Stores place objects to avoid fetching.
   const [places, setPlaces] = useState<Place[]>([]);
 
-  // Search options
-  const [queryParameters, setQueryParameters] = useState<QueryParameters>({ text: "", isFree: false, start: "", end: "", language: "none" });
+  // Used to filter fetched events.
+  const [queryParameters, setQueryParameters] = useState<QueryParameters>(DEFAULT_QUERY_PARAMETERS);
 
-  // Ran on initial load
+  // Holds the keywords found in the topics keyword set used to filter events.
+  const [topics, setTopics] = useState<Keyword[]>([]);
+
+  const [audiences, setAudiences] = useState<Keyword[]>([]);
+
+  // Ran on initial load.
+  // Loads and sets data to and from the session or local storage.
+  // Also fetch and set languages and keywords used in the event filtering.
   const loadData = async () => {
     setIsWorking(isWorking => true)
 
-    let storedImages = localStorage.getItem(LOCAL_STORAGE_IMAGES);
+    let storedImages = localStorage.getItem(LOCAL_STORAGE_KEYS.images);
 
     if (storedImages) {
       let json = JSON.parse(storedImages);
@@ -113,7 +128,7 @@ function App() {
       setPlaceImages(placeImages => images);
     }
 
-    let storedPlaces = localStorage.getItem(LOCAL_STORAGE_PLACES);
+    let storedPlaces = localStorage.getItem(LOCAL_STORAGE_KEYS.places);
 
     if (storedPlaces) {
       let json = JSON.parse(storedPlaces);
@@ -123,7 +138,7 @@ function App() {
       setPlaces(p => places);
     }
 
-    let storedEvents = localStorage.getItem(LOCAL_STORAGE_EVENTS);
+    let storedEvents = localStorage.getItem(LOCAL_STORAGE_KEYS.events);
 
     if (storedEvents) {
       let json = JSON.parse(storedEvents);
@@ -133,7 +148,7 @@ function App() {
       setEvents(e => events);
     }
 
-    let storedSearch = sessionStorage.getItem(LOCAL_STORAGE_SEARCH);
+    let storedSearch = sessionStorage.getItem(LOCAL_STORAGE_KEYS.search);
 
     if (storedSearch) {
       let json = JSON.parse(storedSearch);
@@ -143,7 +158,7 @@ function App() {
       setQueryParameters(qp => search);
     }
 
-    let storedEventIndex = sessionStorage.getItem(SESSION_STORAGE_INDEX);
+    let storedEventIndex = sessionStorage.getItem(LOCAL_STORAGE_KEYS.eventIndex);
 
     if (storedEventIndex) {
       let eventIndex = Number.parseInt(storedEventIndex);
@@ -151,10 +166,109 @@ function App() {
       setEventIndex(ei => eventIndex);
     }
 
+    // Fetch topics keyword set.
+    // Get stored topics from the local storage.
+    // If stored topics do not exist, set fetched topics keyword set as stored keyword set.
+
+    // Compare last modified dates in the keyword sets.
+
+    // If the dates are equal, get the stored topics from the local storage.
+    // If stored topics do not exist, fetch topics. Store fetched topics to the local storage and set to state.
+    // If they do, parse topics and set to state.
+
+    // If dates are not equal, fetch topics. Store fetched topics to the local storage and set to state.
+
+    // Store fetched topics keyword set to local storage.
+
+    let topicsKeywordSet = fetchKeywordSet(keywordSetNames.Topics);
+
+    topicsKeywordSet.then(topicsKeywordSet => {
+      let storedTopicsKeywordSetString = localStorage.getItem(LOCAL_STORAGE_KEYS.keywordSets.topics);
+
+      if (!storedTopicsKeywordSetString) {
+        storedTopicsKeywordSetString = JSON.stringify(topicsKeywordSet);
+      }
+
+      let storedTopicsKeywordSet = JSON.parse(storedTopicsKeywordSetString) as KeywordSet;
+
+
+      if (topicsKeywordSet.last_modified_time === storedTopicsKeywordSet.last_modified_time) {
+        let storedTopicsString = localStorage.getItem(LOCAL_STORAGE_KEYS.topics);
+
+        if (!storedTopicsString) {
+          let topics = fetchKeywordsFromKeywordSet(topicsKeywordSet);
+
+          topics.then(topics => {
+            localStorage.setItem(LOCAL_STORAGE_KEYS.topics, JSON.stringify(topics));
+
+            setTopics(t => topics);
+          })
+        }
+        else {
+          let topics = JSON.parse(storedTopicsString) as Keyword[];
+
+          setTopics(t => topics);
+        }
+      }
+      else {
+        let topics = fetchKeywordsFromKeywordSet(topicsKeywordSet);
+
+        topics.then(topics => {
+          localStorage.setItem(LOCAL_STORAGE_KEYS.topics, JSON.stringify(topics));
+
+          setTopics(t => topics);
+        })
+      }
+
+      localStorage.setItem(LOCAL_STORAGE_KEYS.keywordSets.topics, JSON.stringify(topicsKeywordSet));
+    });
+
+    // Same for audiences.
+
+    let audiencesKeywordSet = fetchKeywordSet(keywordSetNames.Audiences);
+
+    audiencesKeywordSet.then(audiencesKeywordSet => {
+      let storedAudiencesKeywordSetString = localStorage.getItem(LOCAL_STORAGE_KEYS.keywordSets.audiences);
+
+      if (!storedAudiencesKeywordSetString) {
+        storedAudiencesKeywordSetString = JSON.stringify(audiencesKeywordSet);
+      }
+
+      let storedAudiencesKeywordSet = JSON.parse(storedAudiencesKeywordSetString) as KeywordSet;
+
+      if (audiencesKeywordSet.last_modified_time === storedAudiencesKeywordSet.last_modified_time) {
+        let storedAudiencesString = localStorage.getItem(LOCAL_STORAGE_KEYS.audiences);
+
+        if (!storedAudiencesString) {
+          let audiences = fetchKeywordsFromKeywordSet(audiencesKeywordSet);
+
+          audiences.then(audiences => {
+            localStorage.setItem(LOCAL_STORAGE_KEYS.audiences, JSON.stringify(audiences));
+
+            setAudiences(a => audiences);
+          })
+        }
+        else {
+          let audiences = JSON.parse(storedAudiencesString) as Keyword[];
+
+          setAudiences(a => audiences);
+        }
+      }
+      else {
+        let audiences = fetchKeywordsFromKeywordSet(audiencesKeywordSet);
+
+        audiences.then(audiences => {
+          localStorage.setItem(LOCAL_STORAGE_KEYS.audiences, JSON.stringify(audiences));
+
+          setAudiences(a => audiences);
+        })
+      }
+
+      localStorage.setItem(LOCAL_STORAGE_KEYS.keywordSets.audiences, JSON.stringify(audiencesKeywordSet));
+    });
+
     fetchLanguages()
-      .then(fetchedLanguages => assertLanguages(fetchedLanguages))
-      .then(assertedLanguages => unshiftDefaultLanguage(assertedLanguages))
-      .then(unshiftedLanguages => setLanguages(languages => unshiftedLanguages))
+      .then(languages => setLanguages(l => languages))
       .then(() => setIsWorking(isWorking => false))
   }
 
@@ -162,19 +276,23 @@ function App() {
     getEvents();
   }
 
-  // Fetch and set the events
+  // Fetch and set the events.
   const getEvents = async (url?: string) => {
     setIsWorking(isWorking => true);
 
-    sessionStorage.setItem(LOCAL_STORAGE_SEARCH, JSON.stringify(queryParameters));
+    sessionStorage.setItem(LOCAL_STORAGE_KEYS.search, JSON.stringify(queryParameters));
 
+    // Fetch events from the api. Query parameters are built from the queryParameters objects passed here.
+    // Update the events state with fetched events. Also save the state to local storage.
     fetchEvents(url, queryParameters)
       .then(fetchedEvents => assertEvents(fetchedEvents))
       .then(newEvents => { setEvents(events => newEvents); return newEvents })
-      .then(newEvents => localStorage.setItem(LOCAL_STORAGE_EVENTS, JSON.stringify(newEvents)))
+      .then(newEvents => localStorage.setItem(LOCAL_STORAGE_KEYS.events, JSON.stringify(newEvents)))
       .then(() => setIsWorking(isWorking => false));
   }
 
+  // User clicks the event in the list. Get the index of the clicked event. Set the index to a state.
+  // Setting the state then opens up more detailed view of the event.
   const handleEventClick = (event: React.MouseEvent<HTMLLIElement>) => {
     let dataIndex = event.currentTarget.getAttribute("data-index");
 
@@ -190,13 +308,16 @@ function App() {
 
     setEventIndex(eventIndex => index);
 
-    sessionStorage.setItem(SESSION_STORAGE_INDEX, index.toString());
+    sessionStorage.setItem(LOCAL_STORAGE_KEYS.eventIndex, index.toString());
   }
 
   const handleEventDetailsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setEventIndex(eventIndex => -1);
+
+    sessionStorage.setItem(LOCAL_STORAGE_KEYS.eventIndex, "-1");
   }
 
+  // User clicks either next or previous buttons
   const handleNavigationClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     let direction = event.currentTarget.getAttribute("data-direction");
 
@@ -220,6 +341,7 @@ function App() {
     loadData()
   }, []);
 
+  // On events update, see if places are needed to be fetched and if so fetch the needed places and set to state .
   useEffect(() => {
     const updatePlaces = async () => {
       let neededIds = getNeededPlaceIds(events.data, places)
@@ -227,7 +349,7 @@ function App() {
       fetchPlaces(neededIds).then(places => assertPlaces(places)).then(assertedPlaces => {
         let newPlaces = [...places, ...assertedPlaces];
 
-        localStorage.setItem(LOCAL_STORAGE_PLACES, JSON.stringify(newPlaces));
+        localStorage.setItem(LOCAL_STORAGE_KEYS.places, JSON.stringify(newPlaces));
 
         setPlaces(places => newPlaces);
       })
@@ -237,6 +359,7 @@ function App() {
     updatePlaces();
   }, [events]);
 
+  // On places update, see if place images need to be fetched. Fetch and update the state with needed place images.
   useEffect(() => {
     const updateImages = async () => {
       let neededImageIds = getNeededImageIds(placeImages, places);
@@ -246,7 +369,7 @@ function App() {
         .then(images => {
           let newImages = [...placeImages, ...images];
 
-          localStorage.setItem(LOCAL_STORAGE_IMAGES, JSON.stringify(newImages));
+          localStorage.setItem(LOCAL_STORAGE_KEYS.images, JSON.stringify(newImages));
 
           setPlaceImages(placeImages => newImages);
         })
@@ -261,7 +384,7 @@ function App() {
         eventIndex === -1
           ?
           <div id="events-container">
-            <Search languages={languages} queryParameters={queryParameters} setQueryParameters={setQueryParameters} onClick={handleSearchClick}></Search>
+            <Search languages={languages} topics={topics} audiences={audiences} queryParameters={queryParameters} setQueryParameters={setQueryParameters} onClick={handleSearchClick}></Search>
             
             <EventList events={events.data} isWorking={isWorking} onClick={handleEventClick}></EventList>
             

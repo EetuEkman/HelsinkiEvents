@@ -69,20 +69,36 @@ export default function EventPlace(props: Props) {
                             <div>{place?.postal_code} {place?.address_locality?.fi}</div>
                         </div>
                     </div>
-                    <div className="phone">
-                        <FontAwesomeIcon icon={faPhone}></FontAwesomeIcon>
-                        <div>
-                            {place.telephone?.fi ? <div>{place?.telephone?.fi}</div> : <></>}
-                            {place.telephone?.en ? <div>{place?.telephone?.en}</div> : <></>}
-                            {place.telephone?.se ? <div>{place?.telephone?.se}</div> : <></>}
-                        </div>
-                    </div>
-                    
-                    { place.email ? <div className="email"><FontAwesomeIcon icon={faEnvelope}></FontAwesomeIcon><a href={"mailto:" + place?.email}>{place?.email}</a></div> : <></>}
-                    <div className="link">
-                        <FontAwesomeIcon icon={faExternalLink}></FontAwesomeIcon>
-                        <a href={place?.info_url?.fi} target="_blank">{place?.info_url?.fi}</a>
-                    </div>
+                    {
+                        place.telephone
+                            ?
+                            <div className="phone">
+                                <FontAwesomeIcon icon={faPhone}></FontAwesomeIcon>
+                                <div>
+                                    {place.telephone?.fi ? <div>{place?.telephone?.fi}</div> : <></>}
+                                    {place.telephone?.en ? <div>{place?.telephone?.en}</div> : <></>}
+                                    {place.telephone?.se ? <div>{place?.telephone?.se}</div> : <></>}
+                                </div>
+                            </div>
+                            :
+                            <></>
+                    }
+                    {
+                        place.email
+                            ?
+                            <div className="email"><FontAwesomeIcon icon={faEnvelope}></FontAwesomeIcon><a href={"mailto:" + place?.email}>{place?.email}</a></div>
+                            :
+                            <></>
+                    }
+                    {
+                        place.info_url ?
+                            <div className="link">
+                                <FontAwesomeIcon icon={faExternalLink}></FontAwesomeIcon>
+                                <a href={place?.info_url?.fi} target="_blank">{place?.info_url?.fi}</a>
+                            </div>
+                            :
+                            <></>
+                    }
                 </div>
                 {
                     placeImage ?

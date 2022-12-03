@@ -15,8 +15,11 @@
 * {
     box-sizing: border-box;
     font-family: "Roboto";
-    color: var(--text);
     max-width: 100%;
+}
+
+input, textarea, button, select {
+    font: inherit;
 }
 
 html, body {
@@ -84,7 +87,7 @@ button:disabled {
     margin: 0 0.25em 0 0.25em;
 }
 
-#search-container > .select-language > select {
+#search-container > .language > select {
     width: fit-content;
     height: fit-content;
     display: flex;
@@ -96,8 +99,24 @@ button:disabled {
     border-radius: 0.125em;
 }
 
+select {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    padding: 0.5em 1em;
+    border: none;
+    color: var(--background);
+    text-decoration: none;
+    justify-content: center;
+    border-radius: 0.125em;
+}
 
-#search-container > .select-language > select option {
+select option {
+    color: var(--background);
+}
+
+
+#search-container > .language > select option {
     color: var(--background);
 }
 
@@ -137,6 +156,7 @@ button:disabled {
     padding: 0.25em;
     width: 100%;
     gap: 0.25em;
+    color: var(--text);
 }
 
 #event-list > li {
@@ -218,6 +238,7 @@ button:disabled {
     gap: 0.25em;
     height: fit-content;
     padding: 0 1em 0 1em;
+    color: var(--text);
 }
 
 .event-details > div {
@@ -283,6 +304,8 @@ button:disabled {
     object-fit: contain;
     object-position: left;
     filter: brightness(0.9) contrast(1.1);
+    outline: 1px solid black;
+    box-shadow: 1px 1px 1px black;
 }
 
 .event-details > .event-details-images {
@@ -313,6 +336,7 @@ button:disabled {
     font-size: 1.25em;
     z-index: 20;
     outline: 1px solid black;
+    box-shadow: 1px 1px 1px black;
 }
 
 .event-details > .event {
@@ -373,6 +397,7 @@ span {
 label {
     display: inline-flex;
     align-items: center;
+    color: var(--text);
 }
 
 .event-place-information > * > svg {
@@ -413,12 +438,16 @@ label {
     width: 37.5em;
     max-width: 100%;
     outline: 1px solid black;
+    box-shadow: 1px 1px 1px black;
 }
 
 #map {
     height: 100%;
-    z-index: 10;
     filter: brightness(0.9) contrast(1.1);
+}
+
+.search-container > .topics {
+    color: var(--background);
 }
 
 @media only screen and (min-width: 600px) {
