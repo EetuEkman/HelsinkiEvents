@@ -1,5 +1,6 @@
 import React from "react";
 
+// Spinning hollow circle with linear gradient color to show somethings happening.
 export default function Working() {
     return (
         <li className="is-working">

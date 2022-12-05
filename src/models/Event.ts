@@ -14,7 +14,7 @@ interface Description {
     en?: string;
 }
 
-interface Name {
+export interface Name {
     fi?: string;
     se?: string;
     en?: string;

@@ -1,6 +1,7 @@
-import React from "react";
-import Event from "../models/Event"
+import React, { useContext } from "react";
+import Event, { Name } from "../models/Event"
 import Working from "./Working";
+import { AppLanguageContext, AvailableLanguages } from '../App';
 
 interface Props {
     events: Event[];
@@ -9,6 +10,43 @@ interface Props {
 }
 
 export default function EventList(props: Props) {
+    const appLanguageContext = useContext(AppLanguageContext);
+
+    const getFinnishEventNameSpan = (event: Event) => {
+        if (!event.name) {
+            return <span>Tapahtuma</span>
+        }
+
+        return <span>{event.name.fi}</span>
+    }
+
+    const getEnglishEventNameSpan = (event: Event) => {
+        if (!event.name) {
+            return <span>Event</span>
+        }
+
+        if (!event.name.en) {
+            return getFinnishEventNameSpan(event);
+        }
+
+        if (event.name.en.length === 0) {
+            return getFinnishEventNameSpan(event);
+        }
+
+        return <span>{event.name.en}</span>
+    }
+
+    const getEventNameSpan = (event: Event, appLanguage: string) => {
+        switch(appLanguage) {
+            case AvailableLanguages.finnish:
+                return getFinnishEventNameSpan(event);
+            case AvailableLanguages.english:
+                return getEnglishEventNameSpan(event)
+            default:
+                return getEnglishEventNameSpan(event);
+        }
+    }
+
     return (
         <ul id="event-list">
             {
@@ -26,14 +64,14 @@ export default function EventList(props: Props) {
                                         : <span>{new Date(event.start_time).toLocaleDateString()}</span>
                                 }
 
-                                <span>{event.name?.fi}</span>
-
-                                {event.images![0] ? <img src={event.images![0].url}></img> : <></>}
+                                { getEventNameSpan(event, appLanguageContext) }
+  
+                                { event.images![0] ? <img src={event.images![0].url}></img> : null }
                             </li>
                         )
                     })
                 :
-                <li style={{justifyContent: "center"}}>No events.</li>
+                <li style={{justifyContent: "center"}}>{appLanguageContext === AvailableLanguages.finnish ? "Ei tapahtumia." : "No events."}</li>
             }
         </ul>
 

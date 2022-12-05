@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext } from 'react';
 import Keyword from '../models/Keyword';
 import Languages from '../models/Languages';
 import QueryParameters from '../models/QueryParameters';
@@ -7,6 +7,7 @@ import TextInput from './TextInput';
 import Select, { MultiValue } from "react-select";
 import Ordering from './Ordering';
 import Language from './Language';
+import { AppLanguageContext, AvailableLanguages } from '../App';
 
 interface Props {
     languages: Languages;
@@ -24,14 +25,30 @@ interface Option {
 }
 
 export default function Search(props: Props) {
-    // Create a list of available options for react select component from the topic keywords.
-    const topicOptions: Option[] = props.topics.map(topic => { return { value: topic.id, label: topic.name.fi } as Option });
+    const appLanguageContext: string = useContext(AppLanguageContext);
+
+    function getTopicOptions(appLanguage: string) {
+        switch (appLanguage) {
+            case AvailableLanguages.english:
+                return props.topics.map(topic => { return { value: topic.id, label: topic.name.en } as Option });
+            case AvailableLanguages.finnish:
+                return props.topics.map(topic => { return { value: topic.id, label: topic.name.fi } as Option });
+            default:
+                return props.topics.map(topic => { return { value: topic.id, label: topic.name.en } as Option });                
+        }
+    }
+
+    const topicOptions = getTopicOptions(appLanguageContext);
 
     // Create a list of selected options for the react select by filtering the available options with the topic values in the query parameters.
     const selectedTopicOptions: Option[] = topicOptions.filter(option => props.queryParameters.topics.includes(option.value));
 
     // Create a list of available audience options for the react select component from the audience keywords.
-    const audienceOptions: Option[] = props.audiences.map(audience => { return { value: audience.id, label: audience.name.fi } as Option });
+    const audienceOptions = appLanguageContext === AvailableLanguages.finnish
+    ?
+    props.audiences.map(audience => { return { value: audience.id, label: audience.name.fi } as Option })
+    :
+    props.audiences.map(audience => { return { value: audience.id, label: /* Some english audience names are not set, use finnish audience names instead. */ (audience.name.en ? audience.name.en : audience.name.fi) } as Option });
 
     // List of selected audience options for the react select.
     const selectedAudienceOptions: Option[] = audienceOptions.filter(option => props.queryParameters.audiences.includes(option.value));
@@ -71,37 +88,65 @@ export default function Search(props: Props) {
 
         props.setQueryParameters(qp => queryParameters);
     }
-    
+
     return (
         <div id='search-container'>
             <TextInput queryParameters={props.queryParameters} setQueryParameters={props.setQueryParameters}></TextInput>
 
             <div className="date">
-                <DatePicker label="From" queryParameters={props.queryParameters} setQueryParamaters={props.setQueryParameters}></DatePicker>
-                <DatePicker label="To" queryParameters={props.queryParameters} setQueryParamaters={props.setQueryParameters}></DatePicker>
+                <DatePicker start={true} label="From" queryParameters={props.queryParameters} setQueryParamaters={props.setQueryParameters}></DatePicker>
+                <DatePicker end={true} label="To" queryParameters={props.queryParameters} setQueryParamaters={props.setQueryParameters}></DatePicker>
             </div>
 
             <div className='price'>
-                <label htmlFor="isFree">Is free</label>
+                {
+                    appLanguageContext === AvailableLanguages.finnish
+                    ?
+                    <label htmlFor="isFree">Ilmainen</label>
+                    :
+                    null
+                }
+
+                {
+                    appLanguageContext === AvailableLanguages.english
+                    ?
+                    <label htmlFor="isFree">Is free</label>
+                    :
+                    null
+                }
+                
                 <input type="checkbox" id="isFree" checked={props.queryParameters.isFree ? true : false} onChange={handlePriceChange}></input>
             </div>
 
             <Language languages={props.languages} queryParameters={props.queryParameters} setQueryParameters={props.setQueryParameters}></Language>
             
             <div className='topics'>
-                <label htmlFor='topics'>Topics</label>
-                <Select id='topics' onChange={handleTopicChange} value={selectedTopicOptions} options={topicOptions} isMulti ></Select>
+                {
+                    appLanguageContext === AvailableLanguages.finnish
+                        ?
+                        <label htmlFor='topics'>Aihepiirit</label>
+                        :
+                        <label htmlFor='topics'>Topics</label>
+                }
+
+                <Select id='topics' onChange={handleTopicChange} value={selectedTopicOptions} options={topicOptions} placeholder={appLanguageContext === AvailableLanguages.finnish ? "Valitse" : "Select"} isMulti ></Select>
             </div>
 
             <div className='audiences'>
-                <label htmlFor='audiences'>Audiences</label>
-                <Select id='audiences' onChange={handleAudienceChange} value={selectedAudienceOptions} options={audienceOptions} isMulti></Select>
+            {
+                    appLanguageContext === AvailableLanguages.finnish
+                        ?
+                        <label htmlFor='audiences'>Yleisöt</label>
+                        :
+                        <label htmlFor='audiences'>Audiences</label>
+                }
+                <Select id='audiences' onChange={handleAudienceChange} value={selectedAudienceOptions} options={audienceOptions} placeholder={appLanguageContext === AvailableLanguages.finnish ? "Valitse" : "Select"} isMulti></Select>
             </div>
             
             <Ordering queryParameters={props.queryParameters} setQueryParameters={props.setQueryParameters}></Ordering>
 
             <div className='get-events'>
-                <button onClick={props.onClick}>Get events</button>
+                <button onClick={props.onClick}>{ appLanguageContext === AvailableLanguages.finnish ? "Hae tapahtumat" : "Get events"}</button>
             </div>
         </div>
     )

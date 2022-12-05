@@ -20,6 +20,8 @@ import fetchEvents, { assertEvents } from './FetchEvents';
 import fetchLanguages from './FetchLanguages';
 import fetchKeywordsFromKeywordSet, { fetchKeywordSet, keywordSetNames } from './FetchKeywords';
 
+import LanguageSelect from './LanguageSelect/LanguageSelect';
+
 
 const LANGUAGES_PLACEHOLDER: Languages = {
   data: [
@@ -55,7 +57,7 @@ const DEFAULT_QUERY_PARAMETERS = {
   audiences: []
 }
 
-const LOCAL_STORAGE_KEYS = {
+export const LOCAL_STORAGE_KEYS = {
   places: "Helsinki-events/places-v1",
   images: "Helsinki-events/images-v1",
   events: "Helsinki-events/events-v1",
@@ -63,27 +65,19 @@ const LOCAL_STORAGE_KEYS = {
   eventIndex: "Helsinki-events/event_index-v1",
   topics: "Helsinki-events/topics-v1",
   audiences: "Helsinki-events/audiences-v1",
+  appLanguage: "Helsinki-events/app_language-v1",
   keywordSets: {
     topics: "Helsinki-events/keyword_sets/topics-v1",
     audiences: "Helsinki-events/keyword_sets/audiences-v1"
   }
 }
 
-async function getStoredKeywordSet(keywordSetKey: string, keywordSetName: string): Promise<KeywordSet> {
-  let keywordSetString = localStorage.getItem(keywordSetKey);
-
-  if (!keywordSetString) {
-    let keywordSet = await fetchKeywordSet(keywordSetName);
-
-    localStorage.setItem(keywordSetKey, JSON.stringify(keywordSet));
-
-    return keywordSet;
-  }
-
-  return JSON.parse(keywordSetString) as KeywordSet;
+export enum AvailableLanguages {
+  finnish = "Finnish",
+  english = "English"
 }
 
-
+export const AppLanguageContext = React.createContext<string>(AvailableLanguages.finnish);
 
 function App() {
   // Available languages fetched from the endpoint, used in filtering fetched events.
@@ -111,6 +105,9 @@ function App() {
   const [topics, setTopics] = useState<Keyword[]>([]);
 
   const [audiences, setAudiences] = useState<Keyword[]>([]);
+
+  // Used to track the app language, defaulting to finnish;
+  const [appLanguage, setAppLanguage] = useState<string>(AvailableLanguages.finnish);
 
   // Ran on initial load.
   // Loads and sets data to and from the session or local storage.
@@ -267,6 +264,12 @@ function App() {
       localStorage.setItem(LOCAL_STORAGE_KEYS.keywordSets.audiences, JSON.stringify(audiencesKeywordSet));
     });
 
+    const storedAppLanguage = localStorage.getItem(LOCAL_STORAGE_KEYS.appLanguage);
+
+    if (storedAppLanguage) {
+      setAppLanguage(al => storedAppLanguage);
+    }
+
     fetchLanguages()
       .then(languages => setLanguages(l => languages))
       .then(() => setIsWorking(isWorking => false))
@@ -378,21 +381,29 @@ function App() {
     updateImages();
   }, [places]);
 
+  useEffect(() => {
+    window.scrollTo({top: 0, left: 0, behavior: "auto"});
+  }, [eventIndex]);
+
   return (
     <div className="wrapper">
-      {
-        eventIndex === -1
-          ?
-          <div id="events-container">
-            <Search languages={languages} topics={topics} audiences={audiences} queryParameters={queryParameters} setQueryParameters={setQueryParameters} onClick={handleSearchClick}></Search>
-            
-            <EventList events={events.data} isWorking={isWorking} onClick={handleEventClick}></EventList>
-            
-            <Navigation meta={events.meta} isWorking={isWorking} onClick={handleNavigationClick}></Navigation>
-          </div>
-          :
-          <EventDetails event={events.data[eventIndex]} places={places} placeImages={placeImages} onClick={handleEventDetailsClick}></EventDetails>
-      }
+      <AppLanguageContext.Provider value={appLanguage}>
+        {
+          eventIndex === -1
+            ?
+            <div id="events-container">
+              <LanguageSelect appLanguage={appLanguage} setAppLanguage={setAppLanguage}></LanguageSelect>
+
+              <Search languages={languages} topics={topics} audiences={audiences} queryParameters={queryParameters} setQueryParameters={setQueryParameters} onClick={handleSearchClick}></Search>
+
+              <EventList events={events.data} isWorking={isWorking} onClick={handleEventClick}></EventList>
+
+              <Navigation meta={events.meta} isWorking={isWorking} onClick={handleNavigationClick}></Navigation>
+            </div>
+            :
+            <EventDetails event={events.data[eventIndex]} places={places} placeImages={placeImages} onClick={handleEventDetailsClick}></EventDetails>
+        }
+      </AppLanguageContext.Provider>
     </div>
   )
 }

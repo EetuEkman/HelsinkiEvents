@@ -1,5 +1,6 @@
-import React from "react"
-import QueryParameters from "../models/QueryParameters"
+import React, { useContext } from "react"
+import { AppLanguageContext, AvailableLanguages } from "../App";
+import QueryParameters from "../models/QueryParameters";
 
 interface Props {
     queryParameters: QueryParameters;
@@ -7,12 +8,14 @@ interface Props {
 }
 
 export default function TextInput(props: Props) {
+    const appLanguageContext = useContext(AppLanguageContext);
+
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         let currentTarget = event.currentTarget;
 
         let value = currentTarget.value;
 
-        let newQueryParameters = {...props.queryParameters} as QueryParameters;
+        let newQueryParameters = { ...props.queryParameters } as QueryParameters;
 
         newQueryParameters.text = value;
 
@@ -21,7 +24,14 @@ export default function TextInput(props: Props) {
 
     return (
         <div className="text-input-container">
-            <label htmlFor="text">Text</label>
+            {
+                appLanguageContext === AvailableLanguages.finnish
+                    ?
+                    <label htmlFor="text">Teksti</label>
+                    :
+                    <label htmlFor="text">Text</label>
+            }
+
             <input type="text" id="text" value={props.queryParameters.text} onChange={onChange}></input>
         </div>
     )

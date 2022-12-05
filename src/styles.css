@@ -215,6 +215,7 @@ select option {
 #navigation-container > span {
     display: flex;
     justify-content: center;
+    color: var(--text);
 }
 
 #is-working-circle {
@@ -304,8 +305,6 @@ select option {
     object-fit: contain;
     object-position: left;
     filter: brightness(0.9) contrast(1.1);
-    outline: 1px solid black;
-    box-shadow: 1px 1px 1px black;
 }
 
 .event-details > .event-details-images {
@@ -448,6 +447,12 @@ label {
 
 .search-container > .topics {
     color: var(--background);
+}
+
+.language-select {
+    position: fixed;
+    right: 2em;
+    top: 0.25em;
 }
 
 @media only screen and (min-width: 600px) {

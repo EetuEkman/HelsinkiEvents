@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { AppLanguageContext, AvailableLanguages } from "../App";
 import QueryParameters, { OrderBy } from "../models/QueryParameters";
 
 interface Props {
@@ -6,11 +7,11 @@ interface Props {
     setQueryParameters: React.Dispatch<React.SetStateAction<QueryParameters>>;
 }
 
-function getOrderingText(value: string, language: string = "fi") {
+function getOrderingText(value: string, language: string = AvailableLanguages.finnish) {
     switch(language) {
-        case "fi":
+        case AvailableLanguages.finnish:
             return finnishOrderingText(value);
-        case "en":
+        case AvailableLanguages.english:
             return englishOrderingText(value);
         default:
             return englishOrderingText(value);
@@ -52,6 +53,9 @@ function englishOrderingText(option: string) {
 }
 
 export default function Ordering(props: Props) {
+    
+    const appLanguageContext = useContext(AppLanguageContext);
+    
     const handleOrderingChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         let queryParameters = {...props.queryParameters} as QueryParameters;
 
@@ -82,13 +86,28 @@ export default function Ordering(props: Props) {
 
     return (
         <div className="ordering">
-            <label htmlFor="orderBy">Order by</label>
+            {
+                appLanguageContext === AvailableLanguages.finnish
+                ?
+                <label htmlFor="orderBy">Järjestys</label>
+                :
+                <label htmlFor="orderBy">Order by</label>
+            }
+            
             <select id="orderBy" value={props.queryParameters.orderBy} onChange={handleOrderByChange}>
                 {
-                    Object.values(OrderBy).map((value, index) => <option key={index} value={value}>{getOrderingText(value)}</option>)
+                    Object.values(OrderBy).map((value, index) => <option key={index} value={value}>{getOrderingText(value, appLanguageContext)}</option>)
                 }
             </select>
-            <label htmlFor="descending">Descending</label>
+
+            {
+                appLanguageContext === AvailableLanguages.finnish
+                ?
+                <label htmlFor="descending">Laskeutuva</label>
+                :
+                <label htmlFor="descending">Descending</label>
+            }
+            
             <input type="checkbox" id="descending" checked={props.queryParameters.orderByDescending ? true : false} onChange={handleOrderingChange}></input>
         </div>
     )
