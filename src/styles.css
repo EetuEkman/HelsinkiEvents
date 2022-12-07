@@ -65,10 +65,10 @@ button:disabled {
 #search-container {
     display: flex;
     flex-direction: column;
-    margin: 0;
+    margin: 0 0 0 0;
     padding: 0;
     align-items: stretch;
-    max-width: 100%;
+    gap: 0.25em;
 }
 
 #search-container > * > button {
@@ -83,8 +83,16 @@ button:disabled {
     padding: 0.25em;
 }
 
+#search-container > .get-events {
+    margin: 0.25em 0 0.25em 0;
+}
+
 #search-container > div > * {
     margin: 0 0.25em 0 0.25em;
+}
+
+#search-container > .date > div {
+    margin: 0 0 0 -0.25em;
 }
 
 #search-container > .language > select {
@@ -122,20 +130,32 @@ select option {
 
 #search-container > .date {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    gap: 0.5em;
 }
 
-#search-container > .date > input {
+#search-container > .date > div {
+    display: flex;
+    flex-direction: row;
+    height: fit-content;
+    padding: 0 0 0 0.5em;
+}
+
+#search-container > .date > div > input {
     width: fit-content;
     height: fit-content;
     display: flex;
-    padding: 0.5em 1em;
+    padding: 0.5em;
+    margin-left: 0.5em;
     border: none;
     color: var(--background);
     text-decoration: none;
     justify-content: center;
     border-radius: 0.125em;
+}
+
+#search-container > .text-input-container > input[type="text"] {
+    max-width: 12em;
 }
 
 #events-container {
@@ -252,8 +272,8 @@ select option {
 }
 
 .event-details > .event-description > * {
-    margin-top: 0.125em;
-    margin-bottom: 0.125em;
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
     padding: 0.125em;
 }
 
@@ -278,7 +298,8 @@ select option {
     width: 100%;
     height: fit-content;
     max-height: 10em;
-    gap: 0.125em;
+    gap: 0.5em;
+    align-items: center;
 }
 
 .event-details > .event-place > .event-place-information > div {
@@ -286,7 +307,12 @@ select option {
 }
 
 .event-details > .event-place > .event-place-information > div > svg {
-    margin-right: 0.25em;
+    margin-right: 0.5em;
+}
+
+.event-place-information > .link > div {
+    display: flex;
+    width: 100%;
 }
 
 .event-details > .event-place > .event-place-image-container {
@@ -380,6 +406,7 @@ select option {
 }
 
 .event-details-external-links > div > a > svg {
+    padding: 0.25em;
     height: 100%;
     width: 100%;
     filter: brightness(0) saturate(100%) invert(68%) sepia(39%) saturate(6115%) hue-rotate(127deg) brightness(103%) contrast(103%);
@@ -397,6 +424,7 @@ label {
     display: inline-flex;
     align-items: center;
     color: var(--text);
+    width: 5em;
 }
 
 .event-place-information > * > svg {
@@ -412,20 +440,17 @@ label {
     width: 100%;
     align-items: center;
     justify-content: flex-start;
-    height: 3em;
+}
+
+.event-place-information > div > svg {
+    width: 2em;
+    height: 1.5em;
+    padding: 0.125em;
 }
 
 .event-place-information > .address > svg {
     width: 2em;
     height: 2em;
-}
-
-.event-place-information > .phone > svg {
-    width: 2em;
-}
-
-.event-place-information > .email > svg {
-    width: 2em;
 }
 
 .event-place-information > .link > svg {
@@ -450,9 +475,22 @@ label {
 }
 
 .language-select {
-    position: fixed;
-    right: 2em;
+    position: absolute;
+    right: 0.5em;
     top: 0.25em;
+    z-index: 50;
+}
+
+a {
+    color: #809fff;
+}
+
+a:visited {
+    color: #b98eff;
+}
+
+#orderBy {
+    max-width: 12em;
 }
 
 @media only screen and (min-width: 600px) {
@@ -470,5 +508,12 @@ label {
 
     .event-details > .event-place {
         margin-bottom: 0;
+    }
+
+    .language-select {
+        position: absolute;
+        right: 2em;
+        top: 0.25em;
+        z-index: 50;
     }
 }

@@ -44,7 +44,7 @@ export default function DatePicker(props: Props) {
     }
 
     return (
-        <>
+        <div>
             <label htmlFor={props.label}>{getLabelText(props.label, appLanguageContext)}</label>
             {
                 props.start
@@ -57,6 +57,6 @@ export default function DatePicker(props: Props) {
                         :
                         null
             }
-        </>
+        </div>
     )
 }

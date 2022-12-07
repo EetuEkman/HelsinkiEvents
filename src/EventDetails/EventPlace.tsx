@@ -75,7 +75,7 @@ export default function EventPlace(props: Props) {
                             <div className="phone">
                                 <FontAwesomeIcon icon={faPhone}></FontAwesomeIcon>
                                 <div>
-                                    {place.telephone?.fi ? <div>{place?.telephone?.fi}</div> : <></>}
+                                    {place.telephone?.fi ? <div><a href={"tel:" + place?.telephone?.fi}>{place?.telephone?.fi}</a></div> : <></>}
                                     {place.telephone?.en ? <div>{place?.telephone?.en}</div> : <></>}
                                     {place.telephone?.se ? <div>{place?.telephone?.se}</div> : <></>}
                                 </div>
@@ -94,7 +94,7 @@ export default function EventPlace(props: Props) {
                         place.info_url ?
                             <div className="link">
                                 <FontAwesomeIcon icon={faExternalLink}></FontAwesomeIcon>
-                                <a href={place?.info_url?.fi} target="_blank">{place?.info_url?.fi}</a>
+                                <div><a href={place?.info_url?.fi} target="_blank">{place?.info_url?.fi}</a></div>
                             </div>
                             :
                             <></>

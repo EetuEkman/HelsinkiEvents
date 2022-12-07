@@ -20,7 +20,6 @@ export default function LanguageSelect(props: Props) {
     }
 
     const handleChange = (value: string) => {
-        console.log("LanguageSelect: handleChange: value: " + value);
         switch (value) {
             case "FI":
                 props.setAppLanguage(al => AvailableLanguages.finnish);
