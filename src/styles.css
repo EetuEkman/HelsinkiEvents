@@ -84,7 +84,7 @@ button:disabled {
 }
 
 #search-container > .get-events {
-    margin: 0.25em 0 0.25em 0;
+    margin: 0.25em 0 0 0;
 }
 
 #search-container > div > * {
@@ -155,7 +155,10 @@ select option {
 }
 
 #search-container > .text-input-container > input[type="text"] {
-    max-width: 12em;
+    width: 10em;
+    padding: 0.25em 0 0.25em 0;
+    border-radius: 0.125em;
+    border: none;
 }
 
 #events-container {
@@ -474,11 +477,13 @@ label {
     color: var(--background);
 }
 
-.language-select {
-    position: absolute;
-    right: 0.5em;
-    top: 0.25em;
-    z-index: 50;
+.app-language {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    height: fit-content;
+    padding: 0 0.5em 0 0;
+    margin: 0;
 }
 
 a {
@@ -510,10 +515,12 @@ a:visited {
         margin-bottom: 0;
     }
 
-    .language-select {
-        position: absolute;
-        right: 2em;
-        top: 0.25em;
-        z-index: 50;
+    .app-language {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        height: fit-content;
+        padding: 0 1em 0 0;
+        margin: 0;
     }
 }

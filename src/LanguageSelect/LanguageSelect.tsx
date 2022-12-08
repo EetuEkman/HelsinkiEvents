@@ -40,7 +40,7 @@ export default function LanguageSelect(props: Props) {
     }
 
     return (
-        <div className="language-select">
+        <div className="app-language">
             <ReactFlagsSelect
                 selected={toReactFlagSelectValue(props.appLanguage)}
                 countries={["FI", "GB"]}

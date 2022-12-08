@@ -360,8 +360,6 @@ function App() {
     }
 
     updatePlaces();
-
-    window.scrollTo({top: 0, left: 0, behavior: "auto"});
   }, [events]);
 
   // On places update, see if place images need to be fetched. Fetch and update the state with needed place images.
@@ -384,7 +382,10 @@ function App() {
   }, [places]);
 
   useEffect(() => {
-    window.scrollTo({top: 0, left: 0, behavior: "auto"});
+    if (eventIndex !== -1) {
+      window.scrollTo({top: 0, left: 0, behavior: "auto"});
+    }
+    
   }, [eventIndex]);
 
   return (
@@ -398,8 +399,6 @@ function App() {
 
               <Search languages={languages} topics={topics} audiences={audiences} queryParameters={queryParameters} setQueryParameters={setQueryParameters} onClick={handleSearchClick}></Search>
 
-              <Navigation meta={events.meta} isWorking={isWorking} onClick={handleNavigationClick}></Navigation>
-              
               <EventList events={events.data} isWorking={isWorking} onClick={handleEventClick}></EventList>
 
               <Navigation meta={events.meta} isWorking={isWorking} onClick={handleNavigationClick}></Navigation>
