@@ -288,7 +288,6 @@ function App() {
     // Fetch events from the api. Query parameters are built from the queryParameters objects passed here.
     // Update the events state with fetched events. Also save the state to local storage.
     fetchEvents(url, queryParameters)
-      .then(fetchedEvents => assertEvents(fetchedEvents))
       .then(newEvents => { setEvents(events => newEvents); return newEvents })
       .then(newEvents => localStorage.setItem(LOCAL_STORAGE_KEYS.events, JSON.stringify(newEvents)))
       .then(() => setIsWorking(isWorking => false));
@@ -305,7 +304,7 @@ function App() {
     
     let index = Number.parseInt(dataIndex);
 
-    if (index === NaN) {
+    if (Number.isNaN(index)) {
       return;
     }
 
@@ -320,8 +319,120 @@ function App() {
     sessionStorage.setItem(LOCAL_STORAGE_KEYS.eventIndex, "-1");
   }
 
-  // User clicks either next or previous buttons
+  const loadPage = (pageNumber: number) => {
+    if (Number.isNaN(pageNumber)) {
+      return;
+    }
+
+    // Weird page number requests are set to between 1
+    // or last calculated page number.
+    
+    // Page numbers under 1 are counted as 1
+    // e.g. page number -200 counts as 1
+
+    // e.g. 211 results, 20 per page,
+    // 211 / 20 = 10.55, so 11 pages.
+    // page number 568 counts as 11.
+    
+    // Could also stop and return
+    // or display an error of some sort.
+
+    if (pageNumber < 1) {
+      pageNumber = 1;
+    }
+
+    if (pageNumber > Math.ceil(events.meta.count / 20)) {
+      pageNumber = Math.ceil(events.meta.count / 20);
+    }
+
+    // Build the url
+
+    let targetUrl = "";
+
+    // The url for the currently displayed events is held here
+
+    let currentUrl = events.meta.current!;
+
+    // The url might or might not contain page url parameter
+
+    let split = currentUrl.split("&");
+
+    let index = split.findIndex(e => e.includes("page="));
+
+    if (index === -1) {
+      // Add the page url parameter with the page desired page number
+
+      targetUrl = currentUrl + "&page=" + pageNumber.toString();
+    }
+    else {
+      // Replace the page parameter with our page parameter and page number
+
+      split[index] = "page=" + pageNumber.toString();
+
+      targetUrl = split.join("&");
+    }
+
+    getEvents(targetUrl);
+  }
+
   const handleNavigationClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    let dataPage = event.currentTarget.getAttribute("data-page");
+
+    if (dataPage) {
+      let pageNumber = Number.parseInt(dataPage);
+
+      let eventsCount = events.meta.count;
+
+      let lastPage = Math.ceil(eventsCount / 20);
+
+      if (pageNumber > lastPage) {
+        pageNumber = lastPage;
+      }
+
+      // User wants the first page
+
+      if (pageNumber == 1) {
+        // User is already on the first page
+
+        if (eventsCount <= 20) {
+          return;
+        }
+
+        let targetUrl = "";
+
+        let currentUrl = events.meta.current;
+
+        let split = currentUrl?.split("&");
+
+        let index = split?.findIndex(e => e.includes("page"));
+
+        // "&Page=" query string missing on the first page
+
+        if (index === -1) {
+          targetUrl = currentUrl + "&page=" + pageNumber.toString();
+
+          getEvents(targetUrl);
+
+          return;
+        }
+
+
+      }
+
+      // User wants the last page
+
+      if (pageNumber = lastPage) {
+        // User is already on the last page
+        if (eventsCount <= 20) {
+          return;
+        }
+      }
+
+      // User wants the page in between
+
+      return;
+    }
+    
     let direction = event.currentTarget.getAttribute("data-direction");
 
     if (direction === null || direction === undefined) {
@@ -401,7 +512,7 @@ function App() {
 
               <EventList events={events.data} isWorking={isWorking} onClick={handleEventClick}></EventList>
 
-              <Navigation meta={events.meta} isWorking={isWorking} onClick={handleNavigationClick}></Navigation>
+              <Navigation loadPage={loadPage} meta={events.meta} isWorking={isWorking} onClick={handleNavigationClick}></Navigation>
             </div>
             :
             <EventDetails event={events.data[eventIndex]} places={places} placeImages={placeImages} onClick={handleEventDetailsClick}></EventDetails>

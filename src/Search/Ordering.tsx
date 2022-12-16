@@ -86,29 +86,32 @@ export default function Ordering(props: Props) {
 
     return (
         <div className="ordering">
-            {
-                appLanguageContext === AvailableLanguages.finnish
-                ?
-                <label htmlFor="orderBy">Järjestys</label>
-                :
-                <label htmlFor="orderBy">Order by</label>
-            }
-            
-            <select id="orderBy" value={props.queryParameters.orderBy} onChange={handleOrderByChange}>
+            <div>
                 {
-                    Object.values(OrderBy).map((value, index) => <option key={index} value={value}>{getOrderingText(value, appLanguageContext)}</option>)
+                    appLanguageContext === AvailableLanguages.finnish
+                        ?
+                        <label htmlFor="orderBy">Järjestys</label>
+                        :
+                        <label htmlFor="orderBy">Order by</label>
                 }
-            </select>
 
-            {
-                appLanguageContext === AvailableLanguages.finnish
-                ?
-                <label htmlFor="descending">Laskeutuva</label>
-                :
-                <label htmlFor="descending">Descending</label>
-            }
-            
-            <input type="checkbox" id="descending" checked={props.queryParameters.orderByDescending ? true : false} onChange={handleOrderingChange}></input>
+                <select id="orderBy" value={props.queryParameters.orderBy} onChange={handleOrderByChange}>
+                    {
+                        Object.values(OrderBy).map((value, index) => <option key={index} value={value}>{getOrderingText(value, appLanguageContext)}</option>)
+                    }
+                </select>
+            </div>
+
+            <div>
+                {
+                    appLanguageContext === AvailableLanguages.finnish
+                        ?
+                        <label htmlFor="descending">Laskeutuva</label>
+                        :
+                        <label htmlFor="descending">Descending</label>
+                }
+                <input type="checkbox" id="descending" checked={props.queryParameters.orderByDescending ? true : false} onChange={handleOrderingChange}></input>
+            </div>
         </div>
     )
 }

@@ -6,6 +6,7 @@ interface Props {
     meta: Meta;
     isWorking: boolean;
     onClick: React.MouseEventHandler<HTMLButtonElement>;
+    loadPage: (pageNumber: number) => void;
 }
 
 function getPageNumberFromPreviousUrl(url: string | undefined): string {
@@ -30,10 +31,56 @@ function getMaxPages(itemCount: number, itemsPerPage: number): number {
     return Math.ceil(itemCount / itemsPerPage);
 }
 
+function pageNumberPrompt(appLanguage: string): number | null {
+    let input: string | null;
+
+    switch (appLanguage) {
+        case AvailableLanguages.finnish:
+            input = prompt("Sivunumero");
+
+            while (input !== null && Number.isNaN(Number.parseInt(input))) {
+                input = prompt("Sivunumero");
+            }
+
+            if (input === null) {
+                return null;
+            }
+
+            return Number.parseInt(input);
+
+        default:
+            input = prompt("Page number");
+
+            while (input !== null && Number.isNaN(Number.parseInt(input))) {
+                input = prompt("Page number");
+            }
+
+            if (input === null) {
+                return null;
+            }
+
+            return Number.parseInt(input);
+    }
+}
+
 export default function Navigation(props: Props) {
-    const appLanguageContext = useContext(AppLanguageContext);
+    const appLanguage = useContext(AppLanguageContext);
 
     const pages = getMaxPages(props.meta.count, 20);
+
+    const onPageNumberClick = (event: React.MouseEvent<HTMLSpanElement>) => {
+        if (props.meta.count <= 20) {
+            return;
+        }
+
+        let pageNumber = pageNumberPrompt(appLanguage)
+
+        if (pageNumber === null) {
+            return;
+        }
+
+        props.loadPage(pageNumber);
+    }
 
     return (
         <div id="navigation-container">
@@ -44,17 +91,17 @@ export default function Navigation(props: Props) {
                     <>
                         {props.meta.previous && props.isWorking === false
                             ?
-                            <button data-direction="previous" onClick={props.onClick}>{ appLanguageContext === AvailableLanguages.finnish ? "Edellinen" : "Previous" }</button>
+                            <button data-direction="previous" onClick={props.onClick}>{appLanguage === AvailableLanguages.finnish ? "Edellinen" : "Previous"}</button>
                             :
-                            <button disabled>{ appLanguageContext === AvailableLanguages.finnish ? "Edellinen" : "Previous" }</button>
+                            <button disabled>{appLanguage === AvailableLanguages.finnish ? "Edellinen" : "Previous"}</button>
                         }
-                        <span>{getPageNumberFromPreviousUrl(props.meta.previous)} / {pages}</span>
+                        <span onClick={onPageNumberClick} className="page_number">{getPageNumberFromPreviousUrl(props.meta.previous)} / {pages}</span>
                         {
                             props.meta.next && props.isWorking === false
                                 ?
-                                <button data-direction="next" onClick={props.onClick}>{ appLanguageContext === AvailableLanguages.finnish ? "Seuraava" : "Next" }</button>
+                                <button data-direction="next" onClick={props.onClick}>{appLanguage === AvailableLanguages.finnish ? "Seuraava" : "Next"}</button>
                                 :
-                                <button disabled>{ appLanguageContext === AvailableLanguages.finnish ? "Seuraava" : "Next" }</button>
+                                <button disabled>{appLanguage === AvailableLanguages.finnish ? "Seuraava" : "Next"}</button>
                         }
                     </>
             }

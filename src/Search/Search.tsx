@@ -4,7 +4,7 @@ import Languages from '../models/Languages';
 import QueryParameters from '../models/QueryParameters';
 import DatePicker from "./DatePicker"
 import TextInput from './TextInput';
-import Select, { MultiValue } from "react-select";
+import Select, { GroupBase, MultiValue, StylesConfig, ThemeConfig } from "react-select";
 import Ordering from './Ordering';
 import Language from './Language';
 import { AppLanguageContext, AvailableLanguages } from '../App';
@@ -89,6 +89,14 @@ export default function Search(props: Props) {
         props.setQueryParameters(qp => queryParameters);
     }
 
+    // Style config for the react-select.
+    const styles: StylesConfig<Option, true, GroupBase<Option>> = {
+        container: base => ({
+            ...base,
+            width: "15em"
+        })
+    }
+
     return (
         <div id='search-container'>
             <TextInput queryParameters={props.queryParameters} setQueryParameters={props.setQueryParameters}></TextInput>
@@ -129,7 +137,7 @@ export default function Search(props: Props) {
                         <label htmlFor='topics'>Topics</label>
                 }
 
-                <Select id='topics' onChange={handleTopicChange} value={selectedTopicOptions} options={topicOptions} placeholder={appLanguageContext === AvailableLanguages.finnish ? "Valitse" : "Select"} isMulti ></Select>
+                <Select id='topics' theme={theme => ({ ...theme, colors: { ...theme.colors, primary25: "#cccccc" } })} onChange={handleTopicChange} value={selectedTopicOptions} options={topicOptions} placeholder={appLanguageContext === AvailableLanguages.finnish ? "Valitse" : "Select"} styles={styles} isMulti></Select>
             </div>
 
             <div className='audiences'>
@@ -140,7 +148,7 @@ export default function Search(props: Props) {
                         :
                         <label htmlFor='audiences'>Audiences</label>
                 }
-                <Select id='audiences' onChange={handleAudienceChange} value={selectedAudienceOptions} options={audienceOptions} placeholder={appLanguageContext === AvailableLanguages.finnish ? "Valitse" : "Select"} isMulti></Select>
+                <Select id='audiences' theme={theme => ({...theme, colors: {...theme.colors, primary25: "#cccccc"}})} onChange={handleAudienceChange} value={selectedAudienceOptions} options={audienceOptions} placeholder={appLanguageContext === AvailableLanguages.finnish ? "Valitse" : "Select"} styles={styles} isMulti></Select>
             </div>
             
             <Ordering queryParameters={props.queryParameters} setQueryParameters={props.setQueryParameters}></Ordering>
